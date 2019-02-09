@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Magento\CustomerGraphQl\Model\Customer\Address;
 
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\CustomerGraphQl\Model\Customer\Address\Validator as CustomerAddressValidator;
+use Magento\Framework\App\RequestInterface;
 
 /**
  * Customer address create data validator
@@ -20,30 +22,36 @@ class CustomerAddressCreateDataValidator
     private $getAllowedAddressAttributes;
 
     /**
-     * @param GetAllowedAddressAttributes $getAllowedAddressAttributes
+     * @var CustomerAddressValidator
      */
-    public function __construct(GetAllowedAddressAttributes $getAllowedAddressAttributes)
-    {
+    private $customerAddressValidator;
+
+    /**
+     * @param GetAllowedAddressAttributes $getAllowedAddressAttributes
+     * @param CustomerAddressValidator $customerAddressValidator
+     */
+    public function __construct(
+        GetAllowedAddressAttributes $getAllowedAddressAttributes,
+        CustomerAddressValidator $customerAddressValidator
+    ) {
         $this->getAllowedAddressAttributes = $getAllowedAddressAttributes;
+        $this->customerAddressValidator = $customerAddressValidator;
     }
 
     /**
-     * Validate customer address create data
-     *
      * @param array $addressData
-     * @return void
      * @throws GraphQlInputException
+     * @throws \Exception
      */
     public function validate(array $addressData): void
     {
-        $attributes = $this->getAllowedAddressAttributes->execute();
+        $messages = $this->customerAddressValidator->validateAddress($addressData);
+
         $errorInput = [];
 
-        foreach ($attributes as $attributeName => $attributeInfo) {
-            if ($attributeInfo->getIsRequired()
-                && (!isset($addressData[$attributeName]) || empty($addressData[$attributeName]))
-            ) {
-                $errorInput[] = $attributeName;
+        if (!empty($messages)) {
+            foreach ($messages as $message => $messageText) {
+                $errorInput[] = $messageText;
             }
         }
 
@@ -52,5 +60,20 @@ class CustomerAddressCreateDataValidator
                 __('Required parameters are missing: %1', [implode(', ', $errorInput)])
             );
         }
+    }
+
+    /**
+     * @param array $addressData
+     * @return array
+     * @throws \Exception
+     */
+    public function newValidate($addressData)
+    {
+        /** @var RequestInterface $emptyRequest */
+        $emptyRequest = $this->addressExtractor->getRequest();
+        $emptyRequest->setParams($addressData);
+
+        return $this->addressExtractor->validateAddress($emptyRequest);
+
     }
 }
