@@ -88,8 +88,7 @@ class MutableScopeConfig implements MutableScopeConfigInterface
      */
     private function persistConfig($path, $value, $scopeType, $scopeCode): void
     {
-        $pathParts = explode('/', $path);
-        $store = '';
+        $store = 0;
         if ($scopeType === \Magento\Store\Model\ScopeInterface::SCOPE_STORE) {
             if ($scopeCode !== null) {
                 $store = ObjectManager::getInstance()
@@ -103,23 +102,9 @@ class MutableScopeConfig implements MutableScopeConfigInterface
                     ->getId();
             }
         }
-        $configData = [
-            'section' => $pathParts[0],
-            'website' => '',
-            'store' => $store,
-            'groups' => [
-                $pathParts[1] => [
-                    'fields' => [
-                        $pathParts[2] => [
-                            'value' => $value
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        ObjectManager::getInstance()
-            ->get(\Magento\Config\Model\Config\Factory::class)
-            ->create(['data' => $configData])
-            ->save();
+        /** @var \Magento\Framework\App\Config\Storage\WriterInterface $writter */
+        $writter = ObjectManager::getInstance()
+            ->get(\Magento\Framework\App\Config\Storage\WriterInterface::class);
+        $writter->save($path, $value, $scopeType, $store);
     }
 }

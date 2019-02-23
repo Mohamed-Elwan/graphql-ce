@@ -86,6 +86,9 @@
                     <element key="magentoComponentsDir">
                         <string>magentoComponentsDir</string>
                     </element>
+                    <element key="magentoConfigFixture">
+                        <string>magentoConfigFixture</string>
+                    </element>
                     <element key="magentoDataFixture">
                         <string>magentoDataFixture</string>
                     </element>
@@ -100,9 +103,6 @@
                     </element>
                     <element key="magentoApiDataFixture">
                         <string>magentoApiDataFixture</string>
-                    </element>
-                    <element key="magentoApiConfigFixture">
-                         <string>magentoApiConfigFixture</string>
                     </element>
                     <element key="Override">
                         <string>Override</string>
