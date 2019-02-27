@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Magento\CustomerGraphQl\Model\Customer\Address;
 
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\CustomerGraphQl\Model\Customer\Address\Validator as CustomerAddressValidator;
 
 /**
  * Customer address update data validator. Patch update is allowed
@@ -15,16 +16,17 @@ use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 class CustomerAddressUpdateDataValidator
 {
     /**
-     * @var GetAllowedAddressAttributes
+     * @var CustomerAddressValidator
      */
-    private $getAllowedAddressAttributes;
+    private $customerAddressValidator;
 
     /**
-     * @param GetAllowedAddressAttributes $getAllowedAddressAttributes
+     * @param CustomerAddressValidator $customerAddressValidator
      */
-    public function __construct(GetAllowedAddressAttributes $getAllowedAddressAttributes)
-    {
-        $this->getAllowedAddressAttributes = $getAllowedAddressAttributes;
+    public function __construct(
+        CustomerAddressValidator $customerAddressValidator
+    ) {
+        $this->customerAddressValidator = $customerAddressValidator;
     }
 
     /**
@@ -36,14 +38,13 @@ class CustomerAddressUpdateDataValidator
      */
     public function validate(array $addressData): void
     {
-        $attributes = $this->getAllowedAddressAttributes->execute();
+        $messages = $this->customerAddressValidator->validateAddress($addressData);
+
         $errorInput = [];
 
-        foreach ($attributes as $attributeName => $attributeInfo) {
-            if ($attributeInfo->getIsRequired()
-                && (isset($addressData[$attributeName]) && empty($addressData[$attributeName]))
-            ) {
-                $errorInput[] = $attributeName;
+        if (!empty($messages)) {
+            foreach ($messages as $messageText) {
+                $errorInput[] = $messageText;
             }
         }
 
