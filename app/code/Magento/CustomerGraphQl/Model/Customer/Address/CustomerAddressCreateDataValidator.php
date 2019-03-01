@@ -36,12 +36,12 @@ class CustomerAddressCreateDataValidator
      */
     public function validate(array $addressData): void
     {
-        $messages = $this->customerAddressValidator->validateAddress($addressData);
+        $errors = $this->customerAddressValidator->validateAddress($addressData);
 
         $errorInput = [];
 
-        if (!empty($messages)) {
-            foreach ($messages as $messageText) {
+        if ($errors !== true) {
+            foreach ($errors as $messageText) {
                 $errorInput[] = $messageText;
             }
         }
