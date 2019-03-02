@@ -21,12 +21,12 @@ class CustomerAddressCreateDataValidator
     private $customerAddressValidator;
 
     /**
-     * @param CustomerAddressValidator $customerAddressValidator
+     * @param CustomerAddressValidator $addressValidator
      */
     public function __construct(
-        CustomerAddressValidator $customerAddressValidator
+        CustomerAddressValidator $addressValidator
     ) {
-        $this->customerAddressValidator = $customerAddressValidator;
+        $this->customerAddressValidator = $addressValidator;
     }
 
     /**
